@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController extends BaseController<Film> {
 
-    private final LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private final LocalDate releaseDate = LocalDate.of(1895, 12, 28);
 
     @GetMapping
     public List<Film> getAllFilms() {
@@ -35,7 +35,7 @@ public class FilmController extends BaseController<Film> {
 
     @Override
     void validate(Film data) {
-        if (data.getReleaseDate().isBefore(START_RELEASE_DATE)) {
+        if (data.getReleaseDate().isBefore(releaseDate)) {
             throw new ValidationException("Дата релиза некорректна");
         }
     }
