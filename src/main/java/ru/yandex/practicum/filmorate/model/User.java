@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @SuperBuilder
-public class User extends BaseUnit{
+public class User extends BaseUnit {
 
     private String name;
 

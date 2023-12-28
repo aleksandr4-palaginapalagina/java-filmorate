@@ -11,16 +11,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserControllerTest {
 
     UserController userController;
+
     @BeforeEach
     void setUp() {
         userController = new UserController();
     }
 
     @Test
-    void validateNegative(){
+    void validateNegative() {
         User user = User.builder()
                 .email("evstigneev@yandex.ru")
-                .birthday(LocalDate.of(1992,11,1))
+                .birthday(LocalDate.of(1992, 11, 1))
                 .login("ьщдщвщш")
                 .build();
         userController.validate(user);
@@ -28,11 +29,11 @@ class UserControllerTest {
     }
 
     @Test
-    void validate(){
+    void validate() {
         User user = User.builder()
                 .name("Alex")
                 .email("evstigneev@yandex.ru")
-                .birthday(LocalDate.of(1992,11,1))
+                .birthday(LocalDate.of(1992, 11, 1))
                 .login("ьщдщвщш")
                 .build();
         userController.validate(user);

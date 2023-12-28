@@ -19,22 +19,22 @@ class FilmControllerTest {
     }
 
     @Test
-    void negativeValidate(){
+    void negativeValidate() {
         Film film = Film.builder()
                 .name("Terminator")
                 .description("Description")
-                .releaseDate(LocalDate.of(1800,9,11))
+                .releaseDate(LocalDate.of(1800, 9, 11))
                 .duration(10)
                 .build();
         assertThrows(ValidationException.class, () -> filmController.validate(film));
     }
 
     @Test
-    void validate(){
+    void validate() {
         Film film = Film.builder()
                 .name("Terminator")
                 .description("Description")
-                .releaseDate(LocalDate.of(1999,9,11))
+                .releaseDate(LocalDate.of(1999, 9, 11))
                 .duration(10)
                 .build();
         filmController.validate(film);

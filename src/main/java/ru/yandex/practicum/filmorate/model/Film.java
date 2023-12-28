@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @SuperBuilder
-public class Film extends BaseUnit{
+public class Film extends BaseUnit {
 
     @NotBlank(message = "название не может быть пустым")
     private String name;
