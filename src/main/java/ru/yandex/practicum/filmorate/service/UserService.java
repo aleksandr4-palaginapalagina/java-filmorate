@@ -25,7 +25,6 @@ public class UserService extends AbstractService<User> {
         user2.addFriend(id);
         storage.update(user1);
         storage.update(user2);
-
     }
 
     public void deleteFriends(int id, int friendId) {
