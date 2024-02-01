@@ -19,30 +19,30 @@ public class UserService extends AbstractService<User> {
     }
 
     public void addFriends(int id, int friendId) {
-        User user1 = storage.get(id);
-        User user2 = storage.get(friendId);
-        user1.addFriend(friendId);
-        user2.addFriend(id);
-        storage.update(user1);
-        storage.update(user2);
+        User user = storage.get(id);
+        User friend = storage.get(friendId);
+        user.addFriend(friendId);
+        friend.addFriend(id);
+        storage.update(user);
+        storage.update(friend);
     }
 
     public void deleteFriends(int id, int friendId) {
-        User user1 = storage.get(id);
-        User user2 = storage.get(friendId);
-        user1.deleteFriend(friendId);
-        user2.deleteFriend(id);
-        storage.update(user1);
-        storage.update(user2);
+        User user = storage.get(id);
+        User friend = storage.get(friendId);
+        user.deleteFriend(friendId);
+        friend.deleteFriend(id);
+        storage.update(user);
+        storage.update(friend);
     }
 
     public List<User> mutualFriends(int id, int friendId) {
 
         Set<Integer> allFriends = new HashSet<>();
         Set<Integer> friends = storage.get(id).getFriends();
-        Set<Integer> friendsUser2 = storage.get(friendId).getFriends();
+        Set<Integer> friendsUser = storage.get(friendId).getFriends();
         for (Integer integer : friends) {
-            if (friendsUser2.contains(integer)) {
+            if (friendsUser.contains(integer)) {
                 allFriends.add(integer);
             }
         }
