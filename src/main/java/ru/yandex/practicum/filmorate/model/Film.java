@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Film.
@@ -29,18 +29,12 @@ public class Film extends BaseUnit {
     @Min(1)
     private int duration;
 
-    private Set<Integer> userId = new HashSet<>();
-
     private int rate = 0;
 
-    public void addLike(int id) {
-        userId.add(id);
-        rate = userId.size();
-    }
+    @NotNull
+    private Mpa mpa;
 
-    public void removeLike(int id) {
-        userId.remove(id);
-        rate = userId.size();
-    }
+    private List<Genre> genres = new ArrayList<>();
+
 
 }

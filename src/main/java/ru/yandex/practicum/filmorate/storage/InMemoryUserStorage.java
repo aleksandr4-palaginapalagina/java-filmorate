@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 
 @Component
+@Deprecated
 public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements UserStorage {
 
 

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 abstract class InMemoryBaseStorage<T extends BaseUnit> implements AbstractStorage<T> {
 
     private Map<Integer, T> storage = new HashMap<>();

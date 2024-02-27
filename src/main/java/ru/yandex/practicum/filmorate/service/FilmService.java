@@ -1,49 +1,53 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.AbstractStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
+
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService extends AbstractService<Film> {
 
     private final LocalDate releaseDate = LocalDate.of(1895, 12, 28);
-    AbstractStorage userStorage;
+
+    private final LikeStorage likeStorage;
+
+    private final UserStorage userStorage;
+
 
     @Autowired
-    FilmService(AbstractStorage<Film> storage, AbstractStorage<User> userStorage) {
+    FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, LikeStorage likeStorage, @Qualifier("userDbStorage") UserStorage userStorage) {
 
-        this.storage = storage;
+        this.storage = filmStorage;
+        this.likeStorage = likeStorage;
         this.userStorage = userStorage;
+
     }
 
     public void addLike(int id, int userId) {
-        Film film = storage.get(id);
+        storage.get(id);
         userStorage.get(userId);
-        film.addLike(userId);
-        storage.update(film);
+        likeStorage.addLike(id, userId);
     }
 
     public void removeLike(int id, int userId) {
-        Film film = storage.get(id);
+
+        storage.get(id);
         userStorage.get(userId);
-        film.removeLike(userId);
-        storage.update(film);
+        likeStorage.removeLike(id, userId);
     }
 
     public List<Film> getPopular(int count) {
-        return storage.getAll().stream().sorted(FILM_COMPARATOR).limit(count).collect(Collectors.toList());
+        return likeStorage.getPopular(count);
     }
 
-
-    public static final Comparator<Film> FILM_COMPARATOR = Comparator.comparingLong(Film::getRate);
 
     @Override
     void validate(Film data) {
