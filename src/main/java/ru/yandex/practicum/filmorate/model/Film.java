@@ -34,7 +34,7 @@ public class Film extends BaseUnit {
     @NotNull
     private Mpa mpa;
 
-    private List<Genre> genres = new ArrayList<>();
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 
 
 }

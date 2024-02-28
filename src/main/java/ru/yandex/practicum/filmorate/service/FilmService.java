@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class FilmService extends AbstractService<Film> {
@@ -21,6 +21,14 @@ public class FilmService extends AbstractService<Film> {
 
     private final UserStorage userStorage;
 
+    @Override
+    public Film update(Film data) {
+        storage.get(data.getId());
+
+        System.out.println(data.getGenres());
+        storage.update(data);
+        return data;
+    }
 
     @Autowired
     FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, LikeStorage likeStorage, @Qualifier("userDbStorage") UserStorage userStorage) {

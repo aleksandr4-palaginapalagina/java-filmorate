@@ -54,24 +54,25 @@ public class FilmDbStorage implements FilmStorage {
         return data;
     }
 
-    private List<Genre> genresFilms(Film data) {
+    private LinkedHashSet<Genre> genresFilms(Film data) {
         final int filmId = data.getId();
         String sqlQuery = "select * from genres where genres_id in (select genre_id from film_genres where film_id = ?)";
-        return jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
+        List<Genre> genresList = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
+        return new LinkedHashSet<>(genresList);
     }
 
     private void saveGenres(Film data) {
         final int filmId = data.getId();
         jdbcTemplate.update("delete from film_genres where film_id = ?", filmId);
 
-        final Set<Genre> genreSet = new HashSet<>(data.getGenres());
-        final List<Genre> genreArrayList = new ArrayList<>(genreSet);
+
+        final List<Genre> genreArrayList = new ArrayList<>(data.getGenres());
         if (genreArrayList == null || genreArrayList.isEmpty()) {
             return;
         }
 
         jdbcTemplate.batchUpdate(
-                "MERGE into film_genres (film_id, genre_id) values (?, ?)",
+                "insert into film_genres (film_id, genre_id) values (?, ?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {

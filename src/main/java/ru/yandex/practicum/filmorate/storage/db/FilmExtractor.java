@@ -19,7 +19,9 @@ public class FilmExtractor implements ResultSetExtractor<Map<Film, List<Genre>>>
     @Override
     public Map<Film, List<Genre>> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<Film, List<Genre>> films = new LinkedHashMap<>();
+        System.out.println("получение популярных фильмов в экстракте");
         while (rs.next()) {
+
             Film film = Film.builder()
                     .id(rs.getInt("id"))
                     .name(rs.getString("name"))

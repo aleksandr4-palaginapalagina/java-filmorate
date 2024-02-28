@@ -14,7 +14,7 @@ import java.util.*;
 public class LikeDbStorage implements LikeStorage {
 
     private final JdbcTemplate jdbcTemplate;
-//    private final FilmExtractor filmExtractor;
+    private final FilmExtractor filmExtractor;
 
     @Override
     public void addLike(int filmId, int userId) {
@@ -53,16 +53,17 @@ public class LikeDbStorage implements LikeStorage {
             film.setGenres(genresFilms(film));
             System.out.println(film.getMpa().getId());
         }
-//        String sqlQuery = "select f.id, f.name, f.description, f.release_date, f.rate, m.mpa_id, m.mpa_name, g.genres_id, g.genres_name from films as f join mpa as m on f.mpa_id = m.mpa_id join film_genres as fg on fg.film_id = f.id left join genres as g on g.genres_id = fg.genre_id";
+//        String sqlQuery = "select f.id, f.name, f.description, f.release_date, f.rate, m.mpa_id, m.mpa_name, g.genres_id, g.genres_name from films as f join mpa as m on f.mpa_id = m.mpa_id join film_genres as fg on f.id = fg.film_id join genres as g on fg.genre_id = g.genres_id order by f.rate";
 //        Map<Film,List<Genre>> popular = jdbcTemplate.query(sqlQuery, filmExtractor);
 //        System.out.println(popular); // Почему не работает extractor? Ошибка в запросе или реализации экстрактора?
 //        return new ArrayList<>();
         return filmspopulars;
     }
 
-    private List<Genre> genresFilms(Film data) {
+    private LinkedHashSet<Genre> genresFilms(Film data) {
         final int filmId = data.getId();
         String sqlQuery = "select * from genres where genres_id in (select genre_id from film_genres where film_id = ?)";
-        return jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
+        List<Genre> genresList = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
+        return new LinkedHashSet<>(genresList);
     }
 }
