@@ -9,12 +9,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -23,6 +21,7 @@ import java.util.*;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FilmExtractor filmExtractor;
 
     @Override
     public Film create(Film data) {
@@ -54,12 +53,6 @@ public class FilmDbStorage implements FilmStorage {
         return data;
     }
 
-    private LinkedHashSet<Genre> genresFilms(Film data) {
-        final int filmId = data.getId();
-        String sqlQuery = "select * from genres where genres_id in (select genre_id from film_genres where film_id = ?)";
-        List<Genre> genresList = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
-        return new LinkedHashSet<>(genresList);
-    }
 
     private void saveGenres(Film data) {
         final int filmId = data.getId();
@@ -87,22 +80,22 @@ public class FilmDbStorage implements FilmStorage {
                     }
                 }
         );
-        System.out.println(genreArrayList);
+
 
     }
 
     @Override
     public List<Film> getAll() {
-        List<Film> films = jdbcTemplate.query("select * from films f, mpa m where f.mpa_id = m.mpa_id", FilmDbStorage::createFilm);
-        if (films == null) {
-            throw new RuntimeException();
-        }
-        for (Film film : films) {
-            film.setGenres(genresFilms(film));
-            System.out.println(film.getMpa().getId());
-        }
+        List<Film> allFilms = jdbcTemplate.query("select f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.id as mpa_id, m.name as mpa_name, g.id as genre_id, g.name as genre_name from films as f left join mpa as m on (f.mpa_id = m.id) left join film_genres as fg on (f.id = fg.film_id) left join genres as g on (fg.genre_id = g.id) order by id desc", filmExtractor);
 
-        return films;
+        List<Film> films = new ArrayList<>();
+        if (allFilms.size() > 1) {
+            for (int i = allFilms.size() - 1; i > -1; i--) {
+                films.add(allFilms.get(i));
+            }
+            return films;
+        }
+        return allFilms;
     }
 
 
@@ -115,28 +108,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film get(int id) {
-        String sqlQuery = "select * from films as f join mpa as m on f.mpa_id = m.mpa_id where f.id = ?";
-        List<Film> films = jdbcTemplate.query(sqlQuery, FilmDbStorage::createFilm, id);
+        String sqlQuery = "select f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.id as mpa_id, m.name as mpa_name, g.id as genre_id, g.name as genre_name from films as f left join mpa as m on (f.mpa_id = m.id) left join film_genres as fg on (f.id = fg.film_id) left join genres as g on (fg.genre_id = g.id) where f.id = ?";
+        List<Film> films = jdbcTemplate.query(sqlQuery, filmExtractor, id);
+        System.out.println(films);
         if (films.size() != 1) {
             throw new NotFoundException("Find any");
         }
         Film film = films.get(0);
-        film.setGenres(genresFilms(film));
         return film;
     }
 
-    static Film createFilm(ResultSet rs, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(rs.getInt("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
-                .rate(rs.getInt("rate"))
-                .mpa(Mpa.builder()
-                        .id(rs.getInt("mpa_id"))
-                        .name(rs.getString("mpa_name"))
-                        .build())
-                .build();
-    }
+
 }

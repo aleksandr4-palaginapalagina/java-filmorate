@@ -9,19 +9,15 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
-public class FilmExtractor implements ResultSetExtractor<Map<Film, List<Genre>>> {
+public class FilmExtractor implements ResultSetExtractor<List<Film>> {
     @Override
-    public Map<Film, List<Genre>> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        Map<Film, List<Genre>> films = new LinkedHashMap<>();
-        System.out.println("получение популярных фильмов в экстракте");
+    public List<Film> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        List<Film> filmList = new ArrayList<>();
+        Map<Film, LinkedHashSet<Genre>> filmListMap = new HashMap<>();
         while (rs.next()) {
-
             Film film = Film.builder()
                     .id(rs.getInt("id"))
                     .name(rs.getString("name"))
@@ -34,16 +30,21 @@ public class FilmExtractor implements ResultSetExtractor<Map<Film, List<Genre>>>
                             .name(rs.getString("mpa_name"))
                             .build())
                     .build();
-            System.out.println(film);
-            films.putIfAbsent(film, new LinkedList<>());
+            filmListMap.putIfAbsent(film, new LinkedHashSet<>());
             Genre genre = Genre.builder()
-                    .id(rs.getInt("genres_id"))
-                    .name(rs.getString("genres_name"))
+                    .id(rs.getInt("genre_id"))
+                    .name(rs.getString("genre_name"))
                     .build();
-            films.get(film).add(genre);
+            if (genre.getId() != 0) {
+                filmListMap.get(film).add(genre);
+            }
 
         }
-        return films;
+        for (Film film : filmListMap.keySet()) {
+            film.setGenres(filmListMap.get(film));
+        }
+        filmList.addAll(filmListMap.keySet());
+        return filmList;
     }
-}
 
+}

@@ -10,14 +10,14 @@ create table if not exists USERS
 
 create table if not exists GENRES
 (
-    genres_id int not null primary key auto_increment,
-    genres_name varchar(255)
+    id int not null primary key auto_increment,
+    name varchar(255)
 );
 
 create table if not exists MPA
 (
-    mpa_id int not null primary key auto_increment,
-    mpa_name varchar(255)
+    id int not null primary key auto_increment,
+    name varchar(255)
 );
 
 create table if not exists FILMS
@@ -28,14 +28,14 @@ create table if not exists FILMS
     release_date date,
     rate int,
     duration int,
-    mpa_id int references MPA(mpa_id),
+    mpa_id int references MPA(id),
     deleted bool default false
 );
 
 create table if not exists FiLM_GENRES
 (
     film_id int references FILMS(id),
-    genre_id int references GENRES(genres_id),
+    genre_id int references GENRES(id),
     PRIMARY KEY (film_id, genre_id)
 );
 

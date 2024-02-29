@@ -25,7 +25,7 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa get(int id) {
-        String sqlQuery = "select * from mpa where mpa_id = ?";
+        String sqlQuery = "select * from mpa where id = ?";
         List<Mpa> mpas = jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa, id);
         if (mpas.size() != 1) {
             throw new NotFoundException("Find any");
@@ -50,8 +50,8 @@ public class MpaDbStorage implements MpaStorage {
 
     static Mpa createMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
-                .id(rs.getInt("mpa_id"))
-                .name(rs.getString("mpa_name"))
+                .id(rs.getInt("id"))
+                .name(rs.getString("name"))
                 .build();
     }
 

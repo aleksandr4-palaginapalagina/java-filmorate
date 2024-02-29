@@ -24,8 +24,6 @@ public class FilmService extends AbstractService<Film> {
     @Override
     public Film update(Film data) {
         storage.get(data.getId());
-
-        System.out.println(data.getGenres());
         storage.update(data);
         return data;
     }
@@ -54,6 +52,7 @@ public class FilmService extends AbstractService<Film> {
 
     public List<Film> getPopular(int count) {
         return likeStorage.getPopular(count);
+
     }
 
 

@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
+
 import ru.yandex.practicum.filmorate.storage.LikeStorage;
+
 
 import java.util.*;
 
@@ -44,26 +45,11 @@ public class LikeDbStorage implements LikeStorage {
 
     @Override
     public List<Film> getPopular(int count) {
-        String sqlQuery = "select * from films f, mpa m where f.mpa_id = m.mpa_id order by rate desc limit ?";
-        List<Film> filmspopulars = jdbcTemplate.query(sqlQuery, FilmDbStorage::createFilm, count);
-        if (filmspopulars == null) {
-            throw new RuntimeException();
-        }
-        for (Film film : filmspopulars) {
-            film.setGenres(genresFilms(film));
-            System.out.println(film.getMpa().getId());
-        }
-//        String sqlQuery = "select f.id, f.name, f.description, f.release_date, f.rate, m.mpa_id, m.mpa_name, g.genres_id, g.genres_name from films as f join mpa as m on f.mpa_id = m.mpa_id join film_genres as fg on f.id = fg.film_id join genres as g on fg.genre_id = g.genres_id order by f.rate";
-//        Map<Film,List<Genre>> popular = jdbcTemplate.query(sqlQuery, filmExtractor);
-//        System.out.println(popular); // Почему не работает extractor? Ошибка в запросе или реализации экстрактора?
-//        return new ArrayList<>();
-        return filmspopulars;
+        String sqlQuery = "select f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.id as mpa_id, m.name as mpa_name, g.id as genre_id, g.name as genre_name from films as f left join mpa as m on (f.mpa_id = m.id) left join film_genres as fg on (f.id = fg.film_id) left join genres as g on (fg.genre_id = g.id) order by f.rate desc limit ?";
+        return jdbcTemplate.query(sqlQuery, filmExtractor, count);
+
+
     }
 
-    private LinkedHashSet<Genre> genresFilms(Film data) {
-        final int filmId = data.getId();
-        String sqlQuery = "select * from genres where genres_id in (select genre_id from film_genres where film_id = ?)";
-        List<Genre> genresList = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
-        return new LinkedHashSet<>(genresList);
-    }
+
 }

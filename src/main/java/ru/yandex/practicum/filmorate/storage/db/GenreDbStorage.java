@@ -20,7 +20,7 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Genre get(int id) {
-        String sqlQuery = "select * from genres where genres_id = ?";
+        String sqlQuery = "select * from genres where id = ?";
         List<Genre> genres = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, id);
         if (genres.size() != 1) {
             throw new NotFoundException("Find any");
@@ -51,8 +51,8 @@ public class GenreDbStorage implements GenreStorage {
 
     static Genre createGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
-                .id(rs.getInt("genres_id"))
-                .name(rs.getString("genres_name"))
+                .id(rs.getInt("id"))
+                .name(rs.getString("name"))
                 .build();
     }
 
