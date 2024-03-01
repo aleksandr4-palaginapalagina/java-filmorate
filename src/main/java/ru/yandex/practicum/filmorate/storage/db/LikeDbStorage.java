@@ -45,7 +45,7 @@ public class LikeDbStorage implements LikeStorage {
 
     @Override
     public List<Film> getPopular(int count) {
-        String sqlQuery = "select f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.id as mpa_id, m.name as mpa_name, g.id as genre_id, g.name as genre_name from films as f left join mpa as m on (f.mpa_id = m.id) left join film_genres as fg on (f.id = fg.film_id) left join genres as g on (fg.genre_id = g.id) order by f.rate desc limit ?";
+        String sqlQuery = "select * from films join mpa on (mpa_id = mpa.id) left join film_genres on (film_id = films.id) left join genres on (genre_id = genres.id) order by films.rate desc limit ?";
         return jdbcTemplate.query(sqlQuery, filmExtractor, count);
 
 

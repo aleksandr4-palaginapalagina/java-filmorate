@@ -59,7 +59,8 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update("delete from film_genres where film_id = ?", filmId);
 
 
-        final List<Genre> genreArrayList = new ArrayList<>(data.getGenres());
+        final List<Genre> genreArrayList = new ArrayList<>();
+        genreArrayList.addAll(data.getGenres());
         if (genreArrayList == null || genreArrayList.isEmpty()) {
             return;
         }
@@ -86,8 +87,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        List<Film> allFilms = jdbcTemplate.query("select f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.id as mpa_id, m.name as mpa_name, g.id as genre_id, g.name as genre_name from films as f left join mpa as m on (f.mpa_id = m.id) left join film_genres as fg on (f.id = fg.film_id) left join genres as g on (fg.genre_id = g.id) order by id desc", filmExtractor);
-
+        List<Film> allFilms = jdbcTemplate.query("select * from films join mpa on (films.mpa_id = mpa.id) left join film_genres on (films.id = film_id) left join genres on (genre_id = genres.id)", filmExtractor);
         List<Film> films = new ArrayList<>();
         if (allFilms.size() > 1) {
             for (int i = allFilms.size() - 1; i > -1; i--) {
@@ -108,9 +108,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film get(int id) {
-        String sqlQuery = "select f.id, f.name, f.description, f.release_date, f.duration, f.rate, m.id as mpa_id, m.name as mpa_name, g.id as genre_id, g.name as genre_name from films as f left join mpa as m on (f.mpa_id = m.id) left join film_genres as fg on (f.id = fg.film_id) left join genres as g on (fg.genre_id = g.id) where f.id = ?";
+        String sqlQuery = "select * from films left join mpa on (films.mpa_id = mpa.id) left join film_genres on (films.id = film_genres.film_id) left join genres on (genres.id = film_genres.genre_id) where films.id = ?";
         List<Film> films = jdbcTemplate.query(sqlQuery, filmExtractor, id);
-        System.out.println(films);
         if (films.size() != 1) {
             throw new NotFoundException("Find any");
         }

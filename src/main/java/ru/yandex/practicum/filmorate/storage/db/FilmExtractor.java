@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.db;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.BaseUnit;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -26,14 +27,14 @@ public class FilmExtractor implements ResultSetExtractor<List<Film>> {
                     .duration(rs.getInt("duration"))
                     .rate(rs.getInt("rate"))
                     .mpa(Mpa.builder()
-                            .id(rs.getInt("mpa_id"))
-                            .name(rs.getString("mpa_name"))
+                            .id(rs.getInt("mpa.id"))
+                            .name(rs.getString("mpa.name"))
                             .build())
                     .build();
             filmListMap.putIfAbsent(film, new LinkedHashSet<>());
             Genre genre = Genre.builder()
-                    .id(rs.getInt("genre_id"))
-                    .name(rs.getString("genre_name"))
+                    .id(rs.getInt("genres.id"))
+                    .name(rs.getString("genres.name"))
                     .build();
             if (genre.getId() != 0) {
                 filmListMap.get(film).add(genre);
